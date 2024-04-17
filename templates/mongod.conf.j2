@@ -24,7 +24,7 @@ storage:
 replication:
   replSetName: {{ mongodb_replication_replsetname }}
 {% if mongodb_replication %}
-  {{ mongodb_replication to_nice_yaml(indent=2) | indent(2) }}
+  {{ mongodb_replication | to_nice_yaml(indent=2) | indent(2) }}
 {% endif %}
 {% endif %}
 

@@ -22,7 +22,7 @@ mongodb_net: {}
 mongodb_security_authorization: disabled
 mongodb_security_keyfile_content: |
   - mysecretpassword
-  - mysecrepassword2
+  - mysecretpasswordtorotate
 mongodb_security: {}
 mongodb_storage: {}
 mongodb_replication_enabled: false
