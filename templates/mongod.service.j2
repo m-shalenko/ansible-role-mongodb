@@ -1,0 +1,36 @@
+[Unit]
+Requires=docker.service
+After=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker rm --force %N
+ExecStart=/usr/bin/docker run \
+  --name=%N \
+  --rm=true \
+  --network=host \
+  --stop-timeout={{ mongodb_docker_stop_timeout }} \
+  --env=TZ={{ mongodb_docker_timezone }} \
+  --env=MONGO_INITDB_ROOT_USERNAME={{ mongodb_initdb_root_username }} \
+  --env=MONGO_INITDB_ROOT_PASSWORD={{ mongodb_initdb_root_password }} \
+{% if mongodb_docker_envs %}
+{% for key, value in mongodb_docker_envs.items() %}
+  --env={{ key }}={{ value }} \
+{% endfor %}
+{% endif %}
+  --volume={{ mongodb_config_directory }}:{{ mongodb_config_directory }} \
+  --volume={{ mongodb_data_directory }}:/data/db \
+  --volume={{ mongodb_log_directory }}:{{ mongodb_log_directory }} \
+{% if mongodb_docker_volumes %}
+{% for item in mongodb_docker_volumes %}
+  --volume={{ item.host_path }}:{{ item.container_path }} \
+{% endfor %}
+{% endif %}
+  {{ mongodb_docker_image }}:{{ mongodb_docker_image_tag }} --config {{ mongodb_config_directory }}/mongod.conf
+ExecStop=-/usr/bin/docker stop %N
+Restart=always
+StartLimitInterval=0
+RestartSec=10
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

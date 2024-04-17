@@ -1,0 +1,38 @@
+---
+mongodb_docker_image: mongodb/mongodb-community-server
+mongodb_docker_image_tag: 5.0.26-ubuntu2004-20240415T091458Z
+mongodb_docker_timezone: Europe/Berlin
+mongodb_docker_stop_timeout: 300
+mongodb_docker_envs: {}
+  # FOO: bar
+mongodb_docker_volumes: []
+  # - host_path: /path/to/host/dir
+  #   container_path: /path/to/container/dir
+mongodb_transparent_huge_pages_disabled: true
+mongodb_pymongo_from_pip: true
+mongodb_pymongo_pip_version: 4.6.3
+mongodb_initdb_root_username: admin
+mongodb_initdb_root_password: admin
+mongodb_config_directory: /etc/mongodb
+mongodb_data_directory: /var/lib/mongodb
+mongodb_log_directory: /var/log/mongodb
+mongodb_net_port: 27017
+mongodb_net_bindip: 0.0.0.0
+mongodb_net: {}
+mongodb_security_authorization: disabled
+mongodb_security_keyfile_content: |
+  - mysecretpassword
+  - mysecrepassword2
+mongodb_security: {}
+mongodb_storage: {}
+mongodb_replication_enabled: false
+mongodb_replication_replsetname: rs0
+mongodb_replication: {}
+mongodb_systemlog_logappend: true
+mongodb_systemlog_logrotate: rename
+mongodb_systemlog: {}
+mongodb_processmanagement: {}
+mongodb_setparameter: {}
+mongodb_operationprofiling: {}
+mongodb_sharding: {}
+mongodb_auditlog: {}

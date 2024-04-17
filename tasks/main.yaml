@@ -1,0 +1,6 @@
+---
+- name: Install MongoDB
+  ansible.builtin.import_tasks: install_mongodb.yaml
+  tags:
+    - install_mongodb
+    - install_mongo

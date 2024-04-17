@@ -1,0 +1,102 @@
+---
+# - name: MongoDB | Ensure that python version is supported
+#   ansible.builtin.assert:
+#     that:
+#       - ansible_python_version is version('3.7.0', '>=')
+
+- name: MongoDB | Install pymongo
+  when: mongodb_pymongo_from_pip
+  block:
+    - name: MongoDB | Install pip
+      ansible.builtin.apt:
+        name: python3-pip
+        state: present
+        update_cache: true
+
+    - name: MongoDB | Install pymongo from pip
+      ansible.builtin.pip:
+        name: "pymongo=={{ mongodb_pymongo_pip_version }}"
+        executable: pip3
+
+- name: MongoDB | Disable transparent huge pages (THP)
+  when: mongodb_transparent_huge_pages_disabled
+  block:
+    - name: MongoDB | Create disable-transparent-huge-pages service
+      ansible.builtin.template:
+        src: disable-transparent-huge-pages.service.j2
+        dest: /etc/systemd/system/disable-transparent-huge-pages.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: MongoDB | Start disable-transparent-huge-pages service
+      ansible.builtin.systemd:
+        name: disable-transparent-huge-pages
+        state: started
+        daemon_reload: true
+        enabled: true
+
+- name: MongoDB | Create work directories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ mongodb_config_directory }}"
+    - "{{ mongodb_data_directory }}"
+    - "{{ mongodb_log_directory }}"
+
+- name: MongoDB | Create a key file
+  ansible.builtin.copy:
+    content: "{{ mongodb_security_keyfile_content }}"
+    dest: "{{ mongodb_config_directory }}/keyfile"
+    owner: root
+    group: root
+    mode: "0400"
+  when:
+    - mongodb_replication_enabled
+    - mongodb_security_authorization == "enabled"
+
+- name: MongoDB | Create config
+  ansible.builtin.template:
+    src: mongod.conf.j2
+    dest: "{{ mongodb_config_directory }}/mongod.conf"
+    owner: root
+    group: root
+    mode: "0640"
+  notify:
+    - "Restart mongodb"
+    - "Wait for {{ mongodb_net_port }} port"
+
+- name: MongoDB | Create systemd service
+  ansible.builtin.template:
+    src: mongod.service.j2
+    dest: /etc/systemd/system/mongod.service
+    owner: root
+    group: root
+    mode: "0640"
+  notify:
+    - "Restart mongodb"
+    - "Wait for {{ mongodb_net_port }} port"
+
+- name: Restart mongodb
+  ansible.builtin.systemd:
+    name: mongodb
+    state: started
+    daemon_reload: true
+    enabled: true
+
+- name: MongoDB | Wait for {{ mongodb_net_port }} port
+  ansible.builtin.wait_for:
+    host: localhost
+    port: "{{ mongodb_net_port }}"
+    delay: 10
+    timeout: 120
+
+# - name: Create a replica set
+#   ansible.builtin.import_tasks: create_replica_set.yaml
+#   tags:
+#     - create_replica_set
+#     - create_rs

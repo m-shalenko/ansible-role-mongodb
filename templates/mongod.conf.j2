@@ -1,0 +1,63 @@
+net:
+  bindIp: {{ mongodb_net_bindip }}
+  port: {{ mongodb_net_port }}
+{% if mongodb_net %}
+  {{ mongodb_net | to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
+
+security:
+  authorization: {{ mongodb_security_authorization }}
+{% if mongodb_replication_enabled and mongodb_security_authorization == 'enabled' %}
+  keyFile: {{ mongodb_config_directory }}/keyfile
+{% endif %}
+{% if mongodb_security %}
+  {{ mongodb_security | to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
+
+storage:
+  dbPath: /data/db
+{% if mongodb_storage %}
+  {{ mongodb_storage | to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
+
+{% if mongodb_replication_enabled %}
+replication:
+  replSetName: {{ mongodb_replication_replsetname }}
+{% if mongodb_replication %}
+  {{ mongodb_replication to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
+{% endif %}
+
+systemLog:
+  destination: file
+  path: {{ mongodb_log_directory }}/mongod.log
+  logAppend: {{ 'true' if mongodb_systemlog_logappend else 'false' }}
+  logRotate: {{ mongodb_systemlog_logrotate }}
+{% if mongodb_systemlog %}
+  {{ mongodb_systemlog | to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
+
+{% if mongodb_processmanagement %}
+processManagement:
+  {{ mongodb_processmanagement | to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
+
+{% if mongodb_setparameter %}
+setParameter:
+  {{ mongodb_setparameter | to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
+
+{% if mongodb_operationprofiling %}
+operationProfiling:
+  {{ mongodb_operationprofiling | to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
+
+{% if mongodb_sharding %}
+sharding:
+  {{ mongodb_sharding | to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
+
+{% if mongodb_auditlog %}
+auditLog:
+  {{ mongodb_auditlog | to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
