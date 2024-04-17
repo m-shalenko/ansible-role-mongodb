@@ -11,8 +11,8 @@ ExecStart=/usr/bin/docker run \
   --user {{ mongodb_user_id }}:{{ mongodb_group_id }} \
   --stop-timeout={{ mongodb_docker_stop_timeout }} \
   --env=TZ={{ mongodb_docker_timezone }} \
-  --env=MONGO_INITDB_ROOT_USERNAME={{ mongodb_initdb_root_username }} \
-  --env=MONGO_INITDB_ROOT_PASSWORD={{ mongodb_initdb_root_password }} \
+  --env=MONGODB_INITDB_ROOT_USERNAME_FILE={{ mongodb_config_directory }}/initdb-root-username \
+  --env=MONGODB_INITDB_ROOT_PASSWORD_FILE={{ mongodb_config_directory }}/initdb-root-password \
 {% if mongodb_docker_envs %}
 {% for key, value in mongodb_docker_envs.items() %}
   --env={{ key }}={{ value }} \
