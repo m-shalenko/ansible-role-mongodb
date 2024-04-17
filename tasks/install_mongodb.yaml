@@ -45,8 +45,8 @@
       ansible.builtin.template:
         src: disable-transparent-huge-pages.service.j2
         dest: /etc/systemd/system/disable-transparent-huge-pages.service
-        owner: mongodb
-        group: mongodb
+        owner: root
+        group: root
         mode: "0644"
 
     - name: MongoDB | Start disable-transparent-huge-pages service
@@ -96,8 +96,8 @@
   ansible.builtin.template:
     src: mongod.service.j2
     dest: /etc/systemd/system/mongod.service
-    owner: mongodb
-    group: mongodb
+    owner: root
+    group: root
     mode: "0640"
   notify:
     - Restart mongodb
