@@ -81,9 +81,9 @@
     - "Restart mongodb"
     - "Wait for {{ mongodb_net_port }} port"
 
-- name: Restart mongodb
+- name: MongoDB | Start systemd service
   ansible.builtin.systemd:
-    name: mongodb
+    name: mongod
     state: started
     daemon_reload: true
     enabled: true
