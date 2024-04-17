@@ -6,7 +6,7 @@
     daemon_reload: true
     enabled: true
 
-- name: "Wait for {{ mongodb_net_port }} port"
+- name: Wait for {{ mongodb_net_port }} port
   ansible.builtin.wait_for:
     host: localhost
     port: "{{ mongodb_net_port }}"

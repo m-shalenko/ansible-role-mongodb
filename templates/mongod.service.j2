@@ -8,6 +8,7 @@ ExecStart=/usr/bin/docker run \
   --name=%N \
   --rm=true \
   --network=host \
+  --user {{ mongodb_user_id }}:{{ mongodb_group_id }} \
   --stop-timeout={{ mongodb_docker_stop_timeout }} \
   --env=TZ={{ mongodb_docker_timezone }} \
   --env=MONGO_INITDB_ROOT_USERNAME={{ mongodb_initdb_root_username }} \
@@ -18,7 +19,8 @@ ExecStart=/usr/bin/docker run \
 {% endfor %}
 {% endif %}
   --volume={{ mongodb_config_directory }}:{{ mongodb_config_directory }} \
-  --volume={{ mongodb_data_directory }}:/data/db \
+  --volume={{ mongodb_data_directory }}/db:/data/db \
+  --volume={{ mongodb_data_directory }}/configdb:/data/configdb \
   --volume={{ mongodb_log_directory }}:{{ mongodb_log_directory }} \
 {% if mongodb_docker_volumes %}
 {% for item in mongodb_docker_volumes %}

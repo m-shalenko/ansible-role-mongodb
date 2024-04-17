@@ -13,10 +13,30 @@
         state: present
         update_cache: true
 
+    - name: MongoDB | Upgrade pip
+      ansible.builtin.shell:
+        cmd: "pip3 install --upgrade pip"
+      changed_when: false
+
     - name: MongoDB | Install pymongo from pip
       ansible.builtin.pip:
         name: "pymongo=={{ mongodb_pymongo_pip_version }}"
         executable: pip3
+
+- name: MongoDB | Create group
+  ansible.builtin.group:
+    name: mongodb
+    state: present
+    gid: "{{ mongodb_group_id }}"
+
+- name: MongoDB | Create user
+  ansible.builtin.user:
+    name: mongodb
+    state: present
+    uid: "{{ mongodb_user_id }}"
+    group: mongodb
+    shell: /sbin/nologin
+    create_home: false
 
 - name: MongoDB | Disable transparent huge pages (THP)
   when: mongodb_transparent_huge_pages_disabled
@@ -25,8 +45,8 @@
       ansible.builtin.template:
         src: disable-transparent-huge-pages.service.j2
         dest: /etc/systemd/system/disable-transparent-huge-pages.service
-        owner: root
-        group: root
+        owner: mongodb
+        group: mongodb
         mode: "0644"
 
     - name: MongoDB | Start disable-transparent-huge-pages service
@@ -40,20 +60,22 @@
   ansible.builtin.file:
     state: directory
     path: "{{ item }}"
-    owner: root
-    group: root
+    owner: mongodb
+    group: mongodb
     mode: "0755"
   loop:
     - "{{ mongodb_config_directory }}"
     - "{{ mongodb_data_directory }}"
+    - "{{ mongodb_data_directory }}/db"
+    - "{{ mongodb_data_directory }}/configdb"
     - "{{ mongodb_log_directory }}"
 
 - name: MongoDB | Create a key file
   ansible.builtin.copy:
     content: "{{ mongodb_security_keyfile_content }}"
     dest: "{{ mongodb_config_directory }}/keyfile"
-    owner: root
-    group: root
+    owner: mongodb
+    group: mongodb
     mode: "0400"
   when:
     - mongodb_replication_enabled
@@ -63,23 +85,23 @@
   ansible.builtin.template:
     src: mongod.conf.j2
     dest: "{{ mongodb_config_directory }}/mongod.conf"
-    owner: root
-    group: root
+    owner: mongodb
+    group: mongodb
     mode: "0640"
   notify:
-    - "Restart mongodb"
-    - "Wait for {{ mongodb_net_port }} port"
+    - Restart mongodb
+    - Wait for {{ mongodb_net_port }} port
 
 - name: MongoDB | Create systemd service
   ansible.builtin.template:
     src: mongod.service.j2
     dest: /etc/systemd/system/mongod.service
-    owner: root
-    group: root
+    owner: mongodb
+    group: mongodb
     mode: "0640"
   notify:
-    - "Restart mongodb"
-    - "Wait for {{ mongodb_net_port }} port"
+    - Restart mongodb
+    - Wait for {{ mongodb_net_port }} port
 
 - name: MongoDB | Start systemd service
   ansible.builtin.systemd:
