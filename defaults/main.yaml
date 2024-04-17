@@ -13,6 +13,7 @@ mongodb_group_id: 27017
 mongodb_transparent_huge_pages_disabled: true
 mongodb_pymongo_from_pip: true
 mongodb_pymongo_pip_version: 4.6.3
+mongodb_upgrade_pip: true
 mongodb_initdb_root_username: admin
 mongodb_initdb_root_password: admin
 mongodb_config_directory: /etc/mongodb

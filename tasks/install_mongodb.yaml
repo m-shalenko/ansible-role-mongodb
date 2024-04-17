@@ -17,6 +17,7 @@
       ansible.builtin.shell:
         cmd: "pip3 install --upgrade pip"
       changed_when: false
+      when: mongodb_upgrade_pip
 
     - name: MongoDB | Install pymongo from pip
       ansible.builtin.pip:
