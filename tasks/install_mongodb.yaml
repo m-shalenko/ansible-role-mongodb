@@ -82,10 +82,10 @@
     - mongodb_replication_enabled
     - mongodb_security_authorization == "enabled"
 
-- name: MongoDB | Create initdb root username/password
+- name: MongoDB | Create initdb root username/password file
   ansible.builtin.copy:
     content: "{{ item.content }}"
-    path: "{{ mongodb_config_directory }}/{{ item.name }}"
+    dest: "{{ mongodb_config_directory }}/{{ item.name }}"
     owner: mongodb
     group: mongodb
     mode: "0640"
